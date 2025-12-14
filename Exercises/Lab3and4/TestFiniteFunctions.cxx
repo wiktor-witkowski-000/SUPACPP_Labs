@@ -9,7 +9,7 @@
 
 int main(){
 //reading the data we wish to analyse
-std::ifstream file("Outputs/data/MysteryData22022.txt");
+std::ifstream file("Outputs/data/MysteryData02022.txt");
 
 // check if file opened successfully
 
