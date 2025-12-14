@@ -3,6 +3,7 @@
 #include <vector>
 #include "FiniteFunctions.h"
 #include <filesystem> //To check extensions in a nice way
+#include <random>
 
 #include "gnuplot-iostream.h" //Needed to produce plots (not part of the course) 
 
@@ -62,9 +63,31 @@ Integration by hand (output needed to normalise function when plotting)
 ###################
 */ 
 double FiniteFunction::integrate(int Ndiv){ //private
-  //ToDo write an integrator
-  return -99;  
+  //Writing an integrator using the trapezoidal rule for constant step size
+  double stepsize = (m_RMax - m_RMin)/(Ndiv + 1);
+
+  // setting initial value for sum
+
+  double sum = 0.0; 
+
+  // Doing the first and last parts of the sum manually
+
+  sum += callFunction(m_RMin)/2; //First term
+  sum += callFunction(m_RMax)/2; // Last term
+  int i = 1;
+
+  // Sum over interior points
+
+  while (i < Ndiv){
+    double xcoor = m_RMin + i*stepsize;
+    sum += callFunction(xcoor);
+    i += 1;
+  }
+
+  double integralsum = sum*stepsize;
+  return integralsum;  
 }
+
 double FiniteFunction::integral(int Ndiv) { //public
   if (Ndiv <= 0){
     std::cout << "Invalid number of divisions for integral, setting Ndiv to 1000" <<std::endl;
@@ -124,6 +147,43 @@ void FiniteFunction::plotData(std::vector<double> &points, int Nbins, bool isdat
   }
 }
 
+double FiniteFunction::sampleUniformX(){
+  static std::mt19937 rng(std::random_device{}()); //Creating random engine
+  std::uniform_real_distribution<double> dist(m_RMin, m_RMax);
+  return dist(rng);
+}
+
+// For y data
+
+double FiniteFunction::sampleGaussianrand(double xcurrent, double sigmaprop){
+   static std::mt19937 rng(std::random_device{}());
+   std::normal_distribution<double> dist(xcurrent, sigmaprop);
+    return dist(rng);
+}
+
+// Acceptance funciton
+
+double FiniteFunction::acceptance(double xcurrent, double yproposed){
+  double fx = callFunction(xcurrent);
+  double fy = callFunction(yproposed);
+
+  // Incase division by zero is present
+
+  if (fx<=0.0){
+    return 1.0;
+  }
+
+  double ratio = fy/fx;
+  return std::min(ratio, 1.0);
+}
+
+// generating T, a random number between 0 and 1.
+
+double FiniteFunction::sampleUniform01() {
+    static std::mt19937 rng(std::random_device{}());
+    static std::uniform_real_distribution<double> dist(0.0, 1.0);
+    return dist(rng);
+}
 
 /*
   #######################################################################################################

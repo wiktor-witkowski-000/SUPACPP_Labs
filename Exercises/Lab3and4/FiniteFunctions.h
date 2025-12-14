@@ -1,6 +1,7 @@
 #include <string>
 #include <vector>
 #include "gnuplot-iostream.h"
+#include <random>
 
 #pragma once //Replacement for IFNDEF
 
@@ -18,7 +19,11 @@ public:
   void setRangeMax(double RMax);
   void setOutfile(std::string outfile);
   void plotFunction(); //Plot the function using scanFunction
-  
+  double sampleUniformX(); //New function to sample data
+  double sampleGaussianrand(double xcurrent, double sigmaprop); // New function to sample y from a gaussian distribution
+  double acceptance(double xcurrent, double yproposed);
+  double sampleUniform01(); //Sampling uniform distribution from 0 to 1 for T.
+
   //Plot the supplied data points (either provided data or points sampled from function) as a histogram using NBins
   void plotData(std::vector<double> &points, int NBins, bool isdata=true); //NB! use isdata flag to pick between data and sampled distributions
   virtual void printInfo(); //Dump parameter info about the current function (Overridable)
